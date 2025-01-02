@@ -10,3 +10,21 @@
   <p>This is my very first dApp More to come...</p>
 </body>
 </html>
+<button id="connectWallet">Wallet verbinden</button>
+<p id="walletAddress">Wallet-Adresse: Noch nicht verbunden</p>
+
+<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js"></script>
+<script>
+  document.getElementById('connectWallet').addEventListener('click', async () => {
+    if (window.solana && window.solana.isPhantom) {
+      try {
+        const response = await window.solana.connect();
+        document.getElementById('walletAddress').innerText = `Wallet-Adresse: ${response.publicKey.toString()}`;
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      alert("Bitte installiere Phantom Wallet!");
+    }
+  });
+</script>
