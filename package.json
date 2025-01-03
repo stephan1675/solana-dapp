@@ -1,0 +1,23 @@
+{
+  "name": "solana-dapp",
+  "version": "1.0.0",
+  "description": "first",
+  "keywords": [
+    "none"
+  ],
+  "homepage": "https://github.com/stephan1675/solana-dapp#readme",
+  "bugs": {
+    "url": "https://github.com/stephan1675/solana-dapp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stephan1675/solana-dapp.git"
+  },
+  "license": "UNLICENSED",
+  "author": "stephan",
+  "type": "none",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  }
+}
