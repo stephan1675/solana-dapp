@@ -35,3 +35,42 @@
     }
   });
 </script>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solana Token Anzeige</title>
+</head>
+<body>
+
+  <h1>Solana Token Anzeige</h1>
+  <p>Token 1 Balance: <span id="token1Balance">Lade...</span></p>
+  <p>Token 2 Balance: <span id="token2Balance">Lade...</span></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js"></script>
+  <script>
+    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+    const token1Address = '5a7vEDQCENKSLaVaTuHnv1AEbYGPDF9xPYeGFRzjsEK5'; // Ersetze durch deine Token-Adresse
+    const token2Address = 'Br7Pe5tPZur2P9SNYBERYFW1ZcUdeVf7CG8RgTkJdbLg'; // Ersetze durch die zweite Token-Adresse
+    const walletAddress = 'DEIN_WALLET_ADDRESS'; // Ersetze mit deiner Wallet-Adresse
+
+    async function getTokenBalance(tokenAddress) {
+      const tokenInfo = await connection.getTokenAccountBalance(
+        new solanaWeb3.PublicKey(tokenAddress)
+      );
+      return tokenInfo.value.amount;
+    }
+
+    async function updateBalances() {
+      const token1Balance = await getTokenBalance(token1Address);
+      const token2Balance = await getTokenBalance(token2Address);
+      
+      document.getElementById('token1Balance').textContent = token1Balance;
+      document.getElementById('token2Balance').textContent = token2Balance;
+    }
+
+    updateBalances();
+  </script>
+
+</body>
+</html>
