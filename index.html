@@ -11,37 +11,11 @@
   <header>
     <h1>SolanaDefi Token</h1>
     <img src="logo.webp" alt="SolanaDefi Logo" width="100" height="100">
-
   </header>
   <p>This is my very first DApp. More to come...</p>
-</body>
 
-</html>
-<button id="connectWallet">Wallet verbinden</button>
-<p id="walletAddress">Wallet-Adresse: Noch nicht verbunden</p>
-
-<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js"></script>
-<script>
-  document.getElementById('connectWallet').addEventListener('click', async () => {
-    if (window.solana && window.solana.isPhantom) {
-      try {
-        const response = await window.solana.connect();
-        document.getElementById('walletAddress').innerText = `Wallet-Adresse: ${response.publicKey.toString()}`;
-      } catch (err) {
-        console.error(err);
-      }
-    } else {
-      alert("Bitte installiere Phantom Wallet!");
-    }
-  });
-</script>
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solana Token Anzeige</title>
-</head>
-<body>
+  <button id="connectWallet">Wallet verbinden</button>
+  <p id="walletAddress">Wallet-Adresse: Noch nicht verbunden</p>
 
   <h1>Solana Token Anzeige</h1>
   <p>Token 1 Balance: <span id="token1Balance">Lade...</span></p>
@@ -49,27 +23,57 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js"></script>
   <script>
-    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
-    const token1Address = '5a7vEDQCENKSLaVaTuHnv1AEbYGPDF9xPYeGFRzjsEK5'; // Ersetze durch deine Token-Adresse
-    const token2Address = 'Br7Pe5tPZur2P9SNYBERYFW1ZcUdeVf7CG8RgTkJdbLg'; // Ersetze durch die zweite Token-Adresse
-    const walletAddress = 'DEIN_WALLET_ADDRESS'; // Ersetze mit deiner Wallet-Adresse
+    let walletPublicKey;
 
-    async function getTokenBalance(tokenAddress) {
-      const tokenInfo = await connection.getTokenAccountBalance(
-        new solanaWeb3.PublicKey(tokenAddress)
-      );
+    // Setze hier deine Token-Adressen
+    const token1Address = new solanaWeb3.PublicKey('5a7vEDQCENKSLaVaTuHnv1AEbYGPDF9xPYeGFRzjsEK5');
+    const token2Address = new solanaWeb3.PublicKey('Br7Pe5tPZur2P9SNYBERYFW1ZcUdeVf7CG8RgTkJdbLg');
+    
+    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+
+    async function getTokenAccountAddress(walletPublicKey, tokenAddress) {
+      const response = await connection.getTokenAccountsByOwner(walletPublicKey, { mint: tokenAddress });
+      if (response.value.length > 0) {
+        return response.value[0].pubkey;
+      }
+      return null;
+    }
+
+    async function getTokenBalance(tokenAccountAddress) {
+      const tokenInfo = await connection.getTokenAccountBalance(tokenAccountAddress);
       return tokenInfo.value.amount;
     }
 
     async function updateBalances() {
-      const token1Balance = await getTokenBalance(token1Address);
-      const token2Balance = await getTokenBalance(token2Address);
-      
-      document.getElementById('token1Balance').textContent = token1Balance;
-      document.getElementById('token2Balance').textContent = token2Balance;
+      const token1Account = await getTokenAccountAddress(walletPublicKey, token1Address);
+      const token2Account = await getTokenAccountAddress(walletPublicKey, token2Address);
+
+      if (token1Account && token2Account) {
+        const token1Balance = await getTokenBalance(token1Account);
+        const token2Balance = await getTokenBalance(token2Account);
+        
+        document.getElementById('token1Balance').textContent = token1Balance;
+        document.getElementById('token2Balance').textContent = token2Balance;
+      } else {
+        document.getElementById('token1Balance').textContent = 'Kein Konto gefunden';
+        document.getElementById('token2Balance').textContent = 'Kein Konto gefunden';
+      }
     }
 
-    updateBalances();
+    document.getElementById('connectWallet').addEventListener('click', async () => {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const response = await window.solana.connect();
+          walletPublicKey = response.publicKey;
+          document.getElementById('walletAddress').innerText = `Wallet-Adresse: ${walletPublicKey.toString()}`;
+          updateBalances();
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        alert("Bitte installiere Phantom Wallet!");
+      }
+    });
   </script>
 
 </body>
